@@ -109,11 +109,14 @@ h2 { font-size: 18px; color: #6B21A8; margin: 28px 0 12px; }
       ).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // Delete entry
+    // Delete entry — matches on all 7 fields for precise targeting
     if (action === 'delete') {
       var delDate = e.parameter.date || '';
       var delTime = e.parameter.time || '';
       var delType = e.parameter.type || '';
+      var delSide = e.parameter.side || '';
+      var delShield = e.parameter.shield || '';
+      var delAmount = e.parameter.amount || '';
       var delDetails = e.parameter.details || '';
       var lastRow = sheet.getLastRow();
       var headerRow = 4;
@@ -121,13 +124,16 @@ h2 { font-size: 18px; color: #6B21A8; margin: 28px 0 12px; }
       // Search from bottom up to find matching row
       for (var r = lastRow; r > headerRow; r--) {
         var rowData = sheet.getRange(r, 1, 1, 7).getValues()[0];
-        var rowDate = rowData[0] ? rowData[0].toString() : '';
         var rowTime = rowData[1] ? rowData[1].toString() : '';
         var rowType = rowData[2] ? rowData[2].toString() : '';
+        var rowSide = rowData[3] ? rowData[3].toString() : '';
+        var rowShield = rowData[4] ? rowData[4].toString() : '';
+        var rowAmount = rowData[5] ? rowData[5].toString() : '';
         var rowDetails = rowData[6] ? rowData[6].toString() : '';
 
         if (rowTime === delTime && rowType === delType &&
-            rowDetails === delDetails) {
+            rowSide === delSide && rowShield === delShield &&
+            rowAmount === delAmount && rowDetails === delDetails) {
           sheet.deleteRow(r);
           return ContentService.createTextOutput(
             JSON.stringify({ success: true, message: 'Entry deleted' })

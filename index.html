@@ -6,315 +6,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Elliot Log">
-<title>Elliot Log 🍼</title>
-<style>
-:root { --orange: #FB923C; --orange-dark: #9A3412; --orange-light: #FFF7ED; --green: #4ADE80; --green-dark: #166534; --green-light: #F0FDF4; --blue: #60A5FA; --blue-dark: #1E40AF; --blue-light: #EFF6FF; --purple: #C084FC; --purple-dark: #6B21A8; --purple-light: #FDF4FF; --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-400: #9CA3AF; --gray-500: #6B7280; --gray-700: #374151; --gray-900: #111827; }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { height: 100%; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #FAFAFA;
-  color: var(--gray-900);
-  min-height: 100%;
-  padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ===== HEADER ===== */
-.header {
-  background: linear-gradient(135deg, var(--orange-light) 0%, var(--purple-light) 100%);
-  padding: calc(env(safe-area-inset-top, 16px) + 16px) 20px 14px;
-  border-bottom: 1px solid #F3E8FF;
-  position: sticky; top: 0; z-index: 20;
-}
-.header-row { display: flex; justify-content: space-between; align-items: center; }
-.header h1 { font-size: 20px; color: var(--orange-dark); }
-.setup-btn { background: none; border: 1px solid var(--gray-200); border-radius: 8px; padding: 6px 10px; font-size: 13px; color: var(--gray-500); cursor: pointer; }
-.header-time { text-align: center; font-size: 12px; color: var(--gray-400); margin-top: 6px; }
-
-/* ===== STATS ===== */
-.stats-bar {
-  display: flex; justify-content: space-around;
-  padding: 14px 20px;
-  background: white;
-  border-bottom: 1px solid var(--gray-100);
-}
-.stat { text-align: center; }
-.stat-val { font-size: 20px; font-weight: 700; }
-.stat-val.feed { color: var(--orange-dark); }
-.stat-val.diaper { color: var(--green-dark); }
-.stat-val.pump { color: var(--blue-dark); }
-.stat-label { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
-.stat-val.time-since { font-size: 14px; color: var(--orange-dark); }
-
-/* ===== TABS ===== */
-.tabs {
-  display: flex; background: white;
-  border-bottom: 1px solid var(--gray-200);
-  position: sticky; z-index: 15;
-}
-.tab { flex: 1; padding: 12px 0; text-align: center; font-size: 14px; font-weight: 600; color: var(--gray-400); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; }
-.tab.active { color: var(--orange-dark); border-bottom-color: var(--orange); }
-
-/* ===== CONTENT ===== */
-.content { padding: 0 16px 16px; max-width: 600px; margin: 0 auto; }
-.view { display: none; }
-.view.active { display: block; }
-
-/* ===== DAY GROUPS ===== */
-.day-group { margin-top: 16px; }
-.day-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 14px;
-  background: white; border-radius: 12px;
-  border: 1px solid var(--gray-200);
-  cursor: pointer; margin-bottom: 8px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-}
-.day-header h3 { font-size: 15px; font-weight: 700; }
-.day-header .day-meta { font-size: 12px; color: var(--gray-400); }
-.day-summary { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 4px 8px; }
-.day-badge { padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
-.day-badge.feed { background: #FDBA74; color: var(--orange-dark); }
-.day-badge.diaper { background: #86EFAC; color: var(--green-dark); }
-.day-badge.pump { background: #93C5FD; color: var(--blue-dark); }
-
-/* ===== ENTRIES ===== */
-.entry-wrapper {
-  position: relative;
-  overflow: hidden;
-  border-radius: 10px;
-  margin-bottom: 6px;
-}
-.entry {
-  display: flex; align-items: flex-start; gap: 10px;
-  padding: 12px 14px;
-  border-left: 4px solid var(--gray-200);
-  border-radius: 10px;
-  font-size: 14px;
-  background: white;
-  position: relative;
-  transition: transform 0.2s ease;
-  z-index: 1;
-}
-.entry.Feed { background: var(--orange-light); border-left-color: var(--orange); }
-.entry.Diaper { background: var(--green-light); border-left-color: var(--green); }
-.entry.Pump { background: var(--blue-light); border-left-color: var(--blue); }
-.entry.Note { background: var(--purple-light); border-left-color: var(--purple); }
-.entry .e-emoji { font-size: 18px; min-width: 24px; line-height: 1.2; }
-.entry .e-time { font-weight: 700; color: var(--gray-500); min-width: 72px; font-size: 13px; line-height: 1.4; }
-.entry .e-detail { flex: 1; color: var(--gray-700); line-height: 1.4; }
-
-/* Delete button behind the entry */
-.entry-delete-bg {
-  position: absolute; right: 0; top: 0; bottom: 0;
-  width: 80px;
-  background: #EF4444;
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-size: 13px; font-weight: 700;
-  border-radius: 0 10px 10px 0;
-  z-index: 0;
-}
-
-/* Visible delete button (tap) */
-.entry .e-delete-btn {
-  background: none; border: none;
-  color: var(--gray-400); font-size: 18px;
-  cursor: pointer; padding: 0 2px;
-  line-height: 1; min-width: 24px; text-align: center;
-}
-.entry .e-delete-btn:hover { color: #EF4444; }
-
-/* ===== FILTER ===== */
-.filter-bar { display: flex; gap: 8px; padding: 14px 0 8px; flex-wrap: wrap; }
-.filter-pill {
-  padding: 6px 14px; border-radius: 20px;
-  border: 1.5px solid var(--gray-200);
-  background: white; font-size: 13px; font-weight: 500; cursor: pointer;
-}
-.filter-pill.active { border-color: var(--orange); background: var(--orange-light); color: var(--orange-dark); font-weight: 600; }
-
-/* ===== BOTTOM BAR ===== */
-.bottom-wrap {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  z-index: 30;
-  display: flex; flex-direction: column;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
-}
-.bottom-bar {
-  background: white;
-  border-top: 1px solid var(--gray-200);
-  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 12px));
-  display: flex; gap: 6px;
-}
-.bot-btn {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
-  padding: 10px 2px; border-radius: 14px; border: none;
-  font-size: 10px; font-weight: 600; cursor: pointer;
-}
-.bot-btn:active { transform: scale(0.93); }
-.bot-btn .bot-icon { font-size: 20px; }
-.bot-btn.pee { background: var(--green-light); color: var(--green-dark); }
-.bot-btn.poo { background: #FEF3C7; color: #92400E; }
-.bot-btn.poopee { background: linear-gradient(135deg, #FEF3C7 0%, #DCFCE7 100%); color: #92400E; }
-.bot-btn.poopee .bot-icon { font-size: 15px; }
-.bot-btn.feed { background: var(--orange-light); color: var(--orange-dark); }
-.bot-btn.pump { background: var(--blue-light); color: var(--blue-dark); }
-.bot-btn.more { background: var(--gray-100); color: var(--gray-700); }
-.bot-btn.voice { background: linear-gradient(135deg, #FDE68A 0%, #FCA5A5 100%); color: #9A3412; }
-.bot-btn.voice.listening { background: linear-gradient(135deg, #FCA5A5 0%, #F87171 100%); animation: voicePulse 1s infinite; }
-@keyframes voicePulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
-
-/* ===== VOICE OVERLAY ===== */
-.voice-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 55;
-  flex-direction: column; align-items: center; justify-content: center;
-  padding: 20px;
-}
-.voice-overlay.show { display: flex; }
-.voice-box {
-  background: white; border-radius: 24px;
-  padding: 32px 24px; width: 100%; max-width: 360px;
-  text-align: center;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-}
-.voice-mic {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: linear-gradient(135deg, #FB923C 0%, #EF4444 100%);
-  display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 20px; font-size: 36px;
-  box-shadow: 0 4px 16px rgba(251,146,60,0.4);
-}
-.voice-mic.listening { animation: micPulse 1.5s infinite; }
-@keyframes micPulse {
-  0%,100% { box-shadow: 0 4px 16px rgba(251,146,60,0.4); transform: scale(1); }
-  50% { box-shadow: 0 4px 32px rgba(239,68,68,0.6); transform: scale(1.08); }
-}
-.voice-status { font-size: 16px; font-weight: 600; color: var(--gray-700); margin-bottom: 8px; }
-.voice-transcript { font-size: 14px; color: var(--gray-500); min-height: 24px; margin-bottom: 16px; word-break: break-word; }
-.voice-parsed {
-  background: var(--gray-50); border-radius: 12px; padding: 14px;
-  margin-bottom: 16px; text-align: left; display: none;
-}
-.voice-parsed .vp-type { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
-.voice-parsed .vp-details { font-size: 13px; color: var(--gray-500); }
-.voice-btns { display: flex; gap: 10px; }
-.voice-btn {
-  flex: 1; padding: 14px; border-radius: 12px; border: none;
-  font-size: 15px; font-weight: 600; cursor: pointer;
-}
-.voice-btn.cancel { background: var(--gray-100); color: var(--gray-700); }
-.voice-btn.confirm { background: var(--green); color: var(--green-dark); }
-.voice-btn.retry { background: var(--orange-light); color: var(--orange-dark); }
-
-/* Voice not supported fallback */
-.voice-fallback {
-  background: var(--orange-light); border-radius: 12px; padding: 14px;
-  margin-bottom: 16px; font-size: 13px; color: var(--orange-dark); text-align: left;
-}
-
-/* ===== MODALS ===== */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 50; align-items: flex-end; justify-content: center; }
-.modal-overlay.show { display: flex; }
-.modal {
-  background: white; border-radius: 20px 20px 0 0;
-  padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 16px));
-  width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto;
-}
-.modal h2 { font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-
-.form-row { margin-bottom: 14px; }
-.form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--gray-500); margin-bottom: 6px; }
-.form-row input, .form-row select, .form-row textarea {
-  width: 100%; padding: 12px 14px; border-radius: 12px;
-  border: 1.5px solid var(--gray-200); font-size: 16px;
-  font-family: inherit; background: var(--gray-50);
-}
-.form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--orange); background: white; }
-.form-row textarea { resize: none; height: 70px; }
-
-.pill-group { display: flex; gap: 8px; flex-wrap: wrap; }
-.pill {
-  padding: 10px 16px; border-radius: 22px;
-  border: 1.5px solid var(--gray-200); background: white;
-  font-size: 14px; font-weight: 500; cursor: pointer;
-}
-.pill.selected { border-color: var(--orange); background: var(--orange-light); color: var(--orange-dark); font-weight: 600; }
-.pill.shield.selected { border-color: var(--purple); background: var(--purple-light); color: var(--purple-dark); }
-
-.submit-btn {
-  width: 100%; padding: 16px; border-radius: 14px; border: none;
-  font-size: 16px; font-weight: 700; color: white; cursor: pointer; margin-top: 10px;
-}
-.submit-btn.feed { background: var(--orange); }
-.submit-btn.pump { background: var(--blue); }
-.submit-btn.diaper { background: var(--green); color: var(--green-dark); }
-.submit-btn.note { background: var(--purple); }
-.cancel-link { display: block; text-align: center; padding: 14px; color: var(--gray-400); font-size: 15px; cursor: pointer; }
-
-.setup-modal input { width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid var(--gray-200); font-size: 14px; font-family: monospace; margin: 8px 0; }
-.setup-modal .save-btn { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--orange); color: white; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; }
-.status-msg { padding: 10px; border-radius: 10px; font-size: 13px; margin-top: 10px; text-align: center; }
-.status-msg.ok { background: var(--green-light); color: var(--green-dark); }
-.status-msg.err { background: #FEE2E2; color: #991B1B; }
-.status-msg.loading { background: var(--orange-light); color: var(--orange-dark); }
-
-.sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
-.sync-dot.connected { background: var(--green); }
-.sync-dot.offline { background: var(--gray-400); }
-.sync-dot.syncing { background: var(--orange); animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-.empty { text-align: center; padding: 40px 20px; color: var(--gray-400); font-size: 15px; line-height: 1.6; }
-
-.quick-diaper-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
-.qd-btn { padding: 18px; border-radius: 14px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; }
-.qd-btn:active { transform: scale(0.97); }
-.qd-btn.pee { background: #DCFCE7; color: #166534; }
-.qd-btn.poo { background: #FEF3C7; color: #92400E; }
-.qd-btn.both { background: #E0F2FE; color: #0C4A6E; }
-.qd-btn.live { background: #FCE7F3; color: #9D174D; }
-
-/* Delete confirmation */
-.delete-confirm {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 60; padding: 20px;
-}
-.delete-confirm-box {
-  background: white; border-radius: 16px; padding: 24px;
-  max-width: 320px; width: 100%; text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-}
-.delete-confirm-box h3 { font-size: 17px; margin-bottom: 8px; }
-.delete-confirm-box p { font-size: 14px; color: var(--gray-500); margin-bottom: 20px; line-height: 1.4; }
-.delete-confirm-box .dc-btns { display: flex; gap: 10px; }
-.delete-confirm-box .dc-btn {
-  flex: 1; padding: 12px; border-radius: 10px; border: none;
-  font-size: 15px; font-weight: 600; cursor: pointer;
-}
-.dc-btn.cancel { background: var(--gray-100); color: var(--gray-700); }
-.dc-btn.confirm { background: #EF4444; color: white; }
-
-/* Auto-add banner */
-.auto-add-banner {
-  background: linear-gradient(135deg, #DCFCE7, #E0F2FE);
-  padding: 18px; margin: 14px 0; border-radius: 14px;
-  text-align: center; animation: fadeIn 0.3s ease;
-}
-.auto-add-banner h3 { font-size: 16px; color: var(--green-dark); margin-bottom: 4px; }
-.auto-add-banner p { font-size: 13px; color: var(--gray-700); }
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-</style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FB923C">
+<title>Elliot Log</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="header">
   <div class="header-row">
-    <h1>Elliot Log 🍼👶</h1>
-    <button class="setup-btn" onclick="showSetup()"><span class="sync-dot" id="syncDot"></span>⚙️</button>
+    <h1>Elliot Log</h1>
+    <button class="setup-btn" data-action="show-setup"><span class="sync-dot" id="syncDot"></span>Setup</button>
   </div>
   <div class="header-time" id="headerTime"></div>
 </div>
@@ -327,18 +29,18 @@ body {
 </div>
 
 <div class="tabs">
-  <button class="tab active" data-view="today" onclick="switchTab(this)">Today</button>
-  <button class="tab" data-view="history" onclick="switchTab(this)">History</button>
+  <button class="tab active" data-view="today" data-action="switch-tab">Today</button>
+  <button class="tab" data-view="history" data-action="switch-tab">History</button>
 </div>
 
 <div class="content">
   <div class="view active" id="todayView">
     <div id="autoAddBanner"></div>
     <div class="filter-bar">
-      <button class="filter-pill active" onclick="setFilter('all',this)">All</button>
-      <button class="filter-pill" onclick="setFilter('Feed',this)">🍼 Feeds</button>
-      <button class="filter-pill" onclick="setFilter('Diaper',this)">🧷 Diapers</button>
-      <button class="filter-pill" onclick="setFilter('Pump',this)">🥛 Pumps</button>
+      <button class="filter-pill active" data-action="set-filter" data-filter="all">All</button>
+      <button class="filter-pill" data-action="set-filter" data-filter="Feed">Feeds</button>
+      <button class="filter-pill" data-action="set-filter" data-filter="Diaper">Diapers</button>
+      <button class="filter-pill" data-action="set-filter" data-filter="Pump">Pumps</button>
     </div>
     <div id="todayEntries"></div>
   </div>
@@ -350,13 +52,13 @@ body {
 <div class="bottom-wrap">
   <div id="toast" style="display:none;background:var(--gray-900);color:white;padding:10px 24px;font-size:14px;font-weight:600;text-align:center;width:100%"></div>
   <div class="bottom-bar">
-    <button class="bot-btn pee" onclick="quickDiaper('Pee diaper')"><span class="bot-icon">💧</span>Pee</button>
-    <button class="bot-btn poo" onclick="quickDiaper('Poo diaper')"><span class="bot-icon">💩</span>Poo</button>
-    <button class="bot-btn poopee" onclick="quickDiaper('Pee & poo diaper')"><span class="bot-icon">💩💧</span>Poo+Pee</button>
-    <button class="bot-btn feed" onclick="showFeedForm()"><span class="bot-icon">🍼</span>Feed</button>
-    <button class="bot-btn pump" onclick="showPumpForm()"><span class="bot-icon">🥛</span>Pump</button>
-    <button class="bot-btn voice" id="voiceBtn" onclick="startVoice()"><span class="bot-icon">🎙️</span>Voice</button>
-    <button class="bot-btn more" onclick="showMoreMenu()"><span class="bot-icon">＋</span>More</button>
+    <button class="bot-btn pee" data-action="quick-diaper" data-diaper="Pee diaper"><span class="bot-icon">💧</span>Pee</button>
+    <button class="bot-btn poo" data-action="quick-diaper" data-diaper="Poo diaper"><span class="bot-icon">💩</span>Poo</button>
+    <button class="bot-btn poopee" data-action="quick-diaper" data-diaper="Pee & poo diaper"><span class="bot-icon">💩💧</span>Poo+Pee</button>
+    <button class="bot-btn feed" data-action="show-feed-form"><span class="bot-icon">🍼</span>Feed</button>
+    <button class="bot-btn pump" data-action="show-pump-form"><span class="bot-icon">🥛</span>Pump</button>
+    <button class="bot-btn voice" id="voiceBtn" data-action="start-voice"><span class="bot-icon">🎙️</span>Voice</button>
+    <button class="bot-btn more" data-action="show-more-menu"><span class="bot-icon">＋</span>More</button>
   </div>
 </div>
 
@@ -371,7 +73,7 @@ body {
       <div class="vp-details" id="vpDetails"></div>
     </div>
     <div class="voice-btns" id="voiceBtns">
-      <button class="voice-btn cancel" onclick="cancelVoice()">Cancel</button>
+      <button class="voice-btn cancel" data-action="cancel-voice">Cancel</button>
     </div>
   </div>
 </div>
@@ -379,45 +81,45 @@ body {
 <!-- Feed Modal -->
 <div class="modal-overlay" id="feedModal">
   <div class="modal">
-    <h2>🍼 Log Feed</h2>
+    <h2>Log Feed</h2>
     <div class="form-row"><label>Time</label><input type="time" id="fTime"></div>
     <div class="form-row">
       <label>Side</label>
       <div class="pill-group">
-        <button class="pill" onclick="pickPill(this,'fSide')">L</button>
-        <button class="pill" onclick="pickPill(this,'fSide')">R</button>
-        <button class="pill" onclick="pickPill(this,'fSide')">L→R</button>
-        <button class="pill" onclick="pickPill(this,'fSide')">R→L</button>
-        <button class="pill" onclick="pickPill(this,'fSide')">LRL</button>
-        <button class="pill" onclick="pickPill(this,'fSide')">RLR</button>
+        <button class="pill" data-action="pick-pill" data-group="fSide">L</button>
+        <button class="pill" data-action="pick-pill" data-group="fSide">R</button>
+        <button class="pill" data-action="pick-pill" data-group="fSide">L→R</button>
+        <button class="pill" data-action="pick-pill" data-group="fSide">R→L</button>
+        <button class="pill" data-action="pick-pill" data-group="fSide">LRL</button>
+        <button class="pill" data-action="pick-pill" data-group="fSide">RLR</button>
       </div>
     </div>
     <div class="form-row">
       <label>Nipple Shield</label>
       <div class="pill-group">
-        <button class="pill shield" onclick="pickPill(this,'fShield')">None</button>
-        <button class="pill shield" onclick="pickPill(this,'fShield')">L</button>
-        <button class="pill shield" onclick="pickPill(this,'fShield')">R</button>
-        <button class="pill shield" onclick="pickPill(this,'fShield')">Both</button>
-        <button class="pill shield" onclick="pickPill(this,'fShield')">Mixed</button>
+        <button class="pill shield" data-action="pick-pill" data-group="fShield">None</button>
+        <button class="pill shield" data-action="pick-pill" data-group="fShield">L</button>
+        <button class="pill shield" data-action="pick-pill" data-group="fShield">R</button>
+        <button class="pill shield" data-action="pick-pill" data-group="fShield">Both</button>
+        <button class="pill shield" data-action="pick-pill" data-group="fShield">Mixed</button>
       </div>
     </div>
     <div class="form-row"><label>Amount (optional)</label><input type="text" id="fAmount" placeholder="e.g. 30ml formula"></div>
     <div class="form-row"><label>Notes</label><textarea id="fNotes" placeholder="e.g. lots of milk, very sleepy..."></textarea></div>
-    <button class="submit-btn feed" onclick="submitFeed()">Log Feed</button>
-    <div class="cancel-link" onclick="closeModal('feedModal')">Cancel</div>
+    <button class="submit-btn feed" id="feedSubmitBtn" data-action="submit-feed">Log Feed</button>
+    <div class="cancel-link" data-action="close-modal" data-modal="feedModal">Cancel</div>
   </div>
 </div>
 
 <!-- Pump Modal -->
 <div class="modal-overlay" id="pumpModal">
   <div class="modal">
-    <h2>🥛 Log Pump</h2>
+    <h2>Log Pump</h2>
     <div class="form-row"><label>Time</label><input type="time" id="pTime"></div>
     <div class="form-row"><label>Amount</label><input type="text" id="pAmount" placeholder="e.g. 30ml"></div>
     <div class="form-row"><label>Notes</label><textarea id="pNotes" placeholder="e.g. mostly left, 12 min..."></textarea></div>
-    <button class="submit-btn pump" onclick="submitPump()">Log Pump</button>
-    <div class="cancel-link" onclick="closeModal('pumpModal')">Cancel</div>
+    <button class="submit-btn pump" id="pumpSubmitBtn" data-action="submit-pump">Log Pump</button>
+    <div class="cancel-link" data-action="close-modal" data-modal="pumpModal">Cancel</div>
   </div>
 </div>
 
@@ -426,703 +128,66 @@ body {
   <div class="modal">
     <h2>More Options</h2>
     <div class="quick-diaper-options">
-      <button class="qd-btn pee" onclick="quickDiaper('Pee diaper');closeModal('moreModal')">💧 Pee</button>
-      <button class="qd-btn poo" onclick="quickDiaper('Poo diaper');closeModal('moreModal')">💩 Poo</button>
-      <button class="qd-btn both" onclick="quickDiaper('Pee & poo diaper');closeModal('moreModal')">💧💩 Both</button>
-      <button class="qd-btn live" onclick="quickDiaper('Pee & poo diaper (live)');closeModal('moreModal')">⚡ Live</button>
+      <button class="qd-btn pee" data-action="quick-diaper-close" data-diaper="Pee diaper">💧 Pee</button>
+      <button class="qd-btn poo" data-action="quick-diaper-close" data-diaper="Poo diaper">💩 Poo</button>
+      <button class="qd-btn both" data-action="quick-diaper-close" data-diaper="Pee & poo diaper">💧💩 Both</button>
+      <button class="qd-btn live" data-action="quick-diaper-close" data-diaper="Pee & poo diaper (live)">⚡ Live</button>
     </div>
-    <button class="submit-btn note" onclick="closeModal('moreModal');showNoteForm()">📝 Add Note</button>
-    <div style="margin-top:14px"><button class="submit-btn" style="background:var(--gray-200);color:var(--gray-700)" onclick="refreshData()">🔄 Refresh from Sheet</button></div>
-    <div class="cancel-link" onclick="closeModal('moreModal')">Cancel</div>
+    <button class="submit-btn note" data-action="show-note-form">Add Note</button>
+    <div style="margin-top:14px"><button class="submit-btn" style="background:var(--gray-200);color:var(--gray-700)" data-action="refresh-data">Refresh from Sheet</button></div>
+    <div class="cancel-link" data-action="close-modal" data-modal="moreModal">Cancel</div>
   </div>
 </div>
 
 <!-- Note Modal -->
 <div class="modal-overlay" id="noteModal">
   <div class="modal">
-    <h2>📝 Add Note</h2>
+    <h2>Add Note</h2>
     <div class="form-row"><label>Time</label><input type="time" id="nTime"></div>
     <div class="form-row"><label>Note</label><textarea id="nText" placeholder="Anything you want to remember..." style="height:90px"></textarea></div>
-    <button class="submit-btn note" onclick="submitNote()">Log Note</button>
-    <div class="cancel-link" onclick="closeModal('noteModal')">Cancel</div>
+    <button class="submit-btn note" id="noteSubmitBtn" data-action="submit-note">Log Note</button>
+    <div class="cancel-link" data-action="close-modal" data-modal="noteModal">Cancel</div>
+  </div>
+</div>
+
+<!-- Diaper Edit Modal (Fix #5) -->
+<div class="modal-overlay" id="diaperModal">
+  <div class="modal">
+    <h2>Edit Diaper</h2>
+    <div class="form-row"><label>Time</label><input type="time" id="dTime"></div>
+    <div class="form-row">
+      <label>Type</label>
+      <div class="pill-group" id="dTypePills">
+        <button class="pill diaper-type" data-action="pick-diaper-pill" data-value="Pee diaper">💧 Pee</button>
+        <button class="pill diaper-type" data-action="pick-diaper-pill" data-value="Poo diaper">💩 Poo</button>
+        <button class="pill diaper-type" data-action="pick-diaper-pill" data-value="Pee & poo diaper">💧💩 Both</button>
+      </div>
+    </div>
+    <div class="form-row"><label>Notes</label><textarea id="dNotes" placeholder="e.g. green, runny..."></textarea></div>
+    <button class="submit-btn diaper" id="diaperSubmitBtn" data-action="submit-diaper">Update Diaper</button>
+    <div class="cancel-link" data-action="close-modal" data-modal="diaperModal">Cancel</div>
   </div>
 </div>
 
 <!-- Setup Modal -->
 <div class="modal-overlay" id="setupModal">
   <div class="modal setup-modal">
-    <h2>⚙️ Setup</h2>
+    <h2>Setup</h2>
     <p style="font-size:13px;color:var(--gray-500);margin-bottom:8px">Paste your Google Apps Script Web App URL:</p>
     <input type="text" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec">
-    <button class="save-btn" onclick="saveSetup()">Save & Test Connection</button>
+    <button class="save-btn" data-action="save-setup">Save & Test Connection</button>
     <div id="setupStatus"></div>
     <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-200)">
       <p style="font-size:12px;color:var(--gray-400)">Dictation URL for Claude skill:</p>
       <p style="font-size:11px;color:var(--gray-500);font-family:monospace;word-break:break-all;margin-top:4px" id="appBaseUrl"></p>
     </div>
-    <div class="cancel-link" onclick="closeModal('setupModal')">Close</div>
+    <div class="cancel-link" data-action="close-modal" data-modal="setupModal">Close</div>
   </div>
 </div>
 
 <!-- Delete Confirm Overlay -->
 <div id="deleteConfirm" style="display:none"></div>
 
-<!-- Toast -->
-
-<script>
-// ============ STATE ============
-let allEntries = [];
-let currentFilter = 'all';
-let scriptUrl = localStorage.getItem('elliot_script_url') || '';
-let picks = { fSide: '', fShield: '' };
-const EMOJIS = { Feed:'\u{1F37C}', Diaper:'\u{1F9F7}', Pump:'\u{1F95B}', Note:'\u{1F4DD}' };
-const SIDE_MAP = { 'L':'L','R':'R','\u2192':'','L\u2192R':'LR','R\u2192L':'RL','LRL':'LRL','RLR':'RLR' };
-const BASE_URL = window.location.origin + window.location.pathname;
-
-// ============ UTILS ============
-function now24(){const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes());}
-function todayStr(){const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
-function pad(n){return String(n).padStart(2,'0');}
-function to12(t){if(!t)return'';const p=t.split(':').map(Number);const h=p[0]%12||12;return h+':'+pad(p[1])+(p[0]>=12?' PM':' AM');}
-function normTime(t){if(!t)return'';if(/^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(t.trim()))return t.trim();if(/^\d{1,2}:\d{2}$/.test(t.trim()))return to12(t.trim());const d=new Date(t);if(!isNaN(d)){const h=d.getHours(),m=d.getMinutes();return(h%12||12)+':'+pad(m)+(h>=12?' PM':' AM');}return t;}
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
-
-function formatDateNice(ds){
-  if(!ds)return'';
-  let d;
-  if(ds.includes('T'))d=new Date(ds);else if(ds.match(/^\d{4}-\d{2}-\d{2}$/))d=new Date(ds+'T12:00:00');else d=new Date(ds);
-  if(isNaN(d))return ds;
-  return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-}
-
-function normDate(ds){
-  if(!ds)return'';
-  let d;
-  if(ds.includes('T'))d=new Date(ds);else if(ds.match(/^\d{4}-\d{2}-\d{2}$/))d=new Date(ds+'T12:00:00');else d=new Date(ds);
-  if(isNaN(d))return ds;
-  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-}
-
-// ============ CLOCK ============
-function updateClock(){
-  const d=new Date();
-  document.getElementById('headerTime').textContent=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})+' \u2022 '+to12(now24());
-}
-updateClock();setInterval(updateClock,30000);
-
-function setSyncState(s){document.getElementById('syncDot').className='sync-dot '+s;}
-
-// ============ TABS & FILTER ============
-function switchTab(el){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById(el.dataset.view+'View').classList.add('active');
-}
-
-function setFilter(f,el){
-  currentFilter=f;
-  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  renderToday();
-}
-
-// ============ MODALS ============
-function showModal(id){document.getElementById(id).classList.add('show');}
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-
-function showSetup(){
-  document.getElementById('scriptUrl').value=scriptUrl;
-  document.getElementById('setupStatus').innerHTML='';
-  document.getElementById('appBaseUrl').textContent=BASE_URL;
-  showModal('setupModal');
-}
-function showFeedForm(){
-  document.getElementById('fTime').value=now24();
-  document.getElementById('fAmount').value='';
-  document.getElementById('fNotes').value='';
-  picks.fSide='';picks.fShield='';
-  document.querySelectorAll('#feedModal .pill').forEach(p=>p.classList.remove('selected'));
-  showModal('feedModal');
-}
-function showPumpForm(){
-  document.getElementById('pTime').value=now24();
-  document.getElementById('pAmount').value='';
-  document.getElementById('pNotes').value='';
-  showModal('pumpModal');
-}
-function showNoteForm(){
-  document.getElementById('nTime').value=now24();
-  document.getElementById('nText').value='';
-  showModal('noteModal');
-}
-function showMoreMenu(){showModal('moreModal');}
-function pickPill(btn,key){
-  btn.parentElement.querySelectorAll('.pill').forEach(p=>p.classList.remove('selected'));
-  btn.classList.add('selected');
-  picks[key]=btn.textContent.trim();
-}
-
-// ============ API ============
-async function apiCall(params){
-  if(!scriptUrl)return null;
-  setSyncState('syncing');
-  try{
-    const url=new URL(scriptUrl);
-    Object.keys(params).forEach(k=>url.searchParams.append(k,params[k]));
-    const res=await fetch(url.toString(),{redirect:'follow'});
-    const data=await res.json();
-    setSyncState('connected');
-    return data;
-  }catch(e){setSyncState('offline');return null;}
-}
-
-async function addEntry(entry){
-  allEntries.push(entry);
-  saveLocal();renderAll();
-  const result=await apiCall({action:'add',...entry});
-  if(result&&result.success)toast('\u2705 Saved to sheet!');
-  else toast('\u{1F4F1} Saved locally');
-}
-
-async function refreshData(){
-  toast('\u{1F504} Loading...');
-  const data=await apiCall({action:'read'});
-  if(data&&data.success&&data.entries){
-    allEntries=data.entries.map(e=>({...e,date:normDate(e.date),time:normTime(e.time)}));
-    saveLocal();renderAll();
-    toast('\u2705 Loaded '+allEntries.length+' entries');
-  }else toast('Using local cache');
-}
-
-function saveLocal(){localStorage.setItem('elliot_entries',JSON.stringify(allEntries));}
-function loadLocal(){const r=localStorage.getItem('elliot_entries');if(r)allEntries=JSON.parse(r);}
-
-// ============ DELETE ============
-function confirmDelete(idx){
-  const entry=allEntries[idx];
-  if(!entry)return;
-  const emoji=EMOJIS[entry.type]||'\u{1F4DD}';
-  const dc=document.getElementById('deleteConfirm');
-  dc.style.display='block';
-  dc.innerHTML='<div class="delete-confirm"><div class="delete-confirm-box">'+
-    '<h3>Delete entry?</h3>'+
-    '<p>'+emoji+' '+(entry.time||'')+' \u2014 '+(entry.details||'')+'</p>'+
-    '<div class="dc-btns">'+
-    '<button class="dc-btn cancel" onclick="cancelDelete()">Keep</button>'+
-    '<button class="dc-btn confirm" onclick="doDelete('+idx+')">Delete</button>'+
-    '</div></div></div>';
-}
-
-function cancelDelete(){document.getElementById('deleteConfirm').style.display='none';}
-
-async function doDelete(idx){
-  document.getElementById('deleteConfirm').style.display='none';
-  const entry=allEntries[idx];
-
-  // Remove locally
-  allEntries.splice(idx,1);
-  saveLocal();renderAll();
-
-  // Delete from sheet by matching row data
-  if(scriptUrl&&entry){
-    const result=await apiCall({
-      action:'delete',
-      date:entry.date||'',
-      time:entry.time||'',
-      type:entry.type||'',
-      details:entry.details||''
-    });
-    if(result&&result.success)toast('\u2705 Deleted from sheet');
-    else toast('\u{1F4F1} Deleted locally');
-  }else{
-    toast('\u{1F4F1} Deleted locally');
-  }
-}
-
-// ============ SUBMIT HANDLERS ============
-function submitFeed(){
-  const time=to12(document.getElementById('fTime').value);
-  const side=SIDE_MAP[picks.fSide]||picks.fSide||'';
-  const shield=picks.fShield||'';
-  const amount=document.getElementById('fAmount').value.trim();
-  const notes=document.getElementById('fNotes').value.trim();
-  let details='Feed';
-  if(side)details+=' on '+side;
-  if(shield&&shield!=='None')details+=' (shield: '+shield+')';
-  else if(shield==='None')details+=' (no shield)';
-  if(amount)details+='; '+amount;
-  if(notes)details+='; '+notes;
-  addEntry({date:todayStr(),time,type:'Feed',side,shield,amount,details});
-  closeModal('feedModal');
-}
-
-function submitPump(){
-  const time=to12(document.getElementById('pTime').value);
-  const amount=document.getElementById('pAmount').value.trim();
-  const notes=document.getElementById('pNotes').value.trim();
-  let details='Pump';
-  if(amount)details+=' '+amount;
-  if(notes)details+='; '+notes;
-  addEntry({date:todayStr(),time,type:'Pump',side:'',shield:'',amount,details});
-  closeModal('pumpModal');
-}
-
-function submitNote(){
-  const time=to12(document.getElementById('nTime').value);
-  const text=document.getElementById('nText').value.trim();
-  if(!text){toast('Enter a note');return;}
-  addEntry({date:todayStr(),time,type:'Note',side:'',shield:'',amount:'',details:text});
-  closeModal('noteModal');
-}
-
-function quickDiaper(details){
-  addEntry({date:todayStr(),time:to12(now24()),type:'Diaper',side:'',shield:'',amount:'',details});
-}
-
-// ============ VOICE INPUT ============
-let recognition = null;
-let voiceState = 'idle'; // idle | listening | parsed
-let parsedEntry = null;
-
-function hasVoiceSupport(){
-  return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-}
-
-function startVoice(){
-  if(!hasVoiceSupport()){
-    toast('Voice not supported in this browser. Use Chrome or Safari.');
-    return;
-  }
-
-  voiceState = 'listening';
-  parsedEntry = null;
-
-  const overlay = document.getElementById('voiceOverlay');
-  const mic = document.getElementById('voiceMic');
-  const status = document.getElementById('voiceStatus');
-  const transcript = document.getElementById('voiceTranscript');
-  const parsed = document.getElementById('voiceParsed');
-  const btns = document.getElementById('voiceBtns');
-
-  overlay.classList.add('show');
-  mic.classList.add('listening');
-  status.textContent = 'Listening...';
-  transcript.textContent = '';
-  parsed.style.display = 'none';
-  btns.innerHTML = '<button class="voice-btn cancel" onclick="cancelVoice()">Cancel</button>';
-
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  recognition = new SpeechRecognition();
-  recognition.continuous = false;
-  recognition.interimResults = true;
-  recognition.lang = 'en-US';
-
-  recognition.onresult = function(event){
-    let interim = '';
-    let final = '';
-    for(let i = event.resultIndex; i < event.results.length; i++){
-      if(event.results[i].isFinal){
-        final += event.results[i][0].transcript;
-      } else {
-        interim += event.results[i][0].transcript;
-      }
-    }
-    transcript.textContent = final || interim;
-    if(final){
-      handleVoiceResult(final.trim());
-    }
-  };
-
-  recognition.onerror = function(event){
-    if(event.error === 'no-speech'){
-      status.textContent = 'No speech detected. Try again?';
-      mic.classList.remove('listening');
-      btns.innerHTML =
-        '<button class="voice-btn cancel" onclick="cancelVoice()">Cancel</button>' +
-        '<button class="voice-btn retry" onclick="cancelVoice();startVoice()">Retry</button>';
-    } else if(event.error === 'not-allowed'){
-      status.textContent = 'Microphone access denied.';
-      mic.classList.remove('listening');
-      btns.innerHTML = '<button class="voice-btn cancel" onclick="cancelVoice()">Close</button>';
-    } else {
-      status.textContent = 'Error: ' + event.error;
-      mic.classList.remove('listening');
-      btns.innerHTML =
-        '<button class="voice-btn cancel" onclick="cancelVoice()">Cancel</button>' +
-        '<button class="voice-btn retry" onclick="cancelVoice();startVoice()">Retry</button>';
-    }
-  };
-
-  recognition.onend = function(){
-    mic.classList.remove('listening');
-    if(voiceState === 'listening' && !parsedEntry){
-      // Speech ended without a final result
-      if(!transcript.textContent){
-        status.textContent = 'No speech detected. Try again?';
-        btns.innerHTML =
-          '<button class="voice-btn cancel" onclick="cancelVoice()">Cancel</button>' +
-          '<button class="voice-btn retry" onclick="cancelVoice();startVoice()">Retry</button>';
-      }
-    }
-  };
-
-  recognition.start();
-}
-
-function cancelVoice(){
-  voiceState = 'idle';
-  if(recognition){try{recognition.stop();}catch(e){}}
-  recognition = null;
-  document.getElementById('voiceOverlay').classList.remove('show');
-  document.getElementById('voiceMic').classList.remove('listening');
-}
-
-function handleVoiceResult(text){
-  voiceState = 'parsed';
-  const mic = document.getElementById('voiceMic');
-  const status = document.getElementById('voiceStatus');
-  const parsed = document.getElementById('voiceParsed');
-  const btns = document.getElementById('voiceBtns');
-
-  mic.classList.remove('listening');
-
-  parsedEntry = parseVoice(text);
-
-  if(!parsedEntry){
-    status.textContent = "Couldn't parse that. Try again?";
-    btns.innerHTML =
-      '<button class="voice-btn cancel" onclick="cancelVoice()">Cancel</button>' +
-      '<button class="voice-btn retry" onclick="cancelVoice();startVoice()">Retry</button>';
-    return;
-  }
-
-  const emoji = EMOJIS[parsedEntry.type] || '\u{1F4DD}';
-  status.textContent = emoji + ' ' + parsedEntry.type + ' detected';
-
-  document.getElementById('vpType').textContent = emoji + ' ' + parsedEntry.summary;
-  document.getElementById('vpDetails').textContent = parsedEntry.details;
-  parsed.style.display = 'block';
-
-  btns.innerHTML =
-    '<button class="voice-btn cancel" onclick="cancelVoice()">Cancel</button>' +
-    '<button class="voice-btn retry" onclick="cancelVoice();startVoice()">Redo</button>' +
-    '<button class="voice-btn confirm" onclick="confirmVoice()">Log It</button>';
-}
-
-function confirmVoice(){
-  if(!parsedEntry) return;
-  addEntry(parsedEntry.entry);
-  cancelVoice();
-  toast(EMOJIS[parsedEntry.entry.type] + ' Logged via voice!');
-}
-
-// ============ VOICE PARSER ============
-function parseVoice(text){
-  const t = text.toLowerCase().trim();
-
-  // ---- DIAPER ----
-  if(matchesAny(t, ['diaper','pee','poo','poop','wet','dirty','meconium','shart','poopy','pooped','peed'])){
-    let diaperType = '';
-    const hasPee = matchesAny(t, ['pee','wet','peed']);
-    const hasPoo = matchesAny(t, ['poo','poop','dirty','meconium','shart','poopy','pooped']);
-    const hasBoth = matchesAny(t, ['both','and']) && hasPee && hasPoo;
-    const isLive = matchesAny(t, ['live']);
-
-    if(hasBoth || (hasPee && hasPoo)){
-      diaperType = 'Pee & poo diaper';
-    } else if(hasPoo){
-      diaperType = 'Poo diaper';
-    } else if(hasPee){
-      diaperType = 'Pee diaper';
-    } else {
-      diaperType = 'Diaper change';
-    }
-
-    // Look for extra notes (color, consistency)
-    let extraNotes = [];
-    const descriptors = ['runny','green','yellow','brown','black','watery','seedy','mucus','sticky','dark','light','big','small','little','huge','massive'];
-    descriptors.forEach(d => { if(t.includes(d)) extraNotes.push(d); });
-
-    if(isLive) diaperType += ' (live)';
-    let details = diaperType;
-    if(extraNotes.length) details += ' (' + extraNotes.join(', ') + ')';
-
-    return {
-      type: 'Diaper',
-      summary: diaperType,
-      details: details,
-      entry: { date: todayStr(), time: to12(now24()), type: 'Diaper', side: '', shield: '', amount: '', details }
-    };
-  }
-
-  // ---- PUMP ----
-  if(matchesAny(t, ['pump','pumped','pumping','expressed'])){
-    let amount = '';
-    let notes = [];
-
-    // Extract amount (e.g., "30 ml", "30ml", "2 ounces", "2oz")
-    const mlMatch = t.match(/(\d+)\s*(?:ml|milliliters?)/i);
-    const ozMatch = t.match(/(\d+)\s*(?:oz|ounces?)/i);
-    if(mlMatch) amount = mlMatch[1] + 'ml';
-    else if(ozMatch) amount = ozMatch[1] + 'oz';
-
-    // Extract duration
-    const durMatch = t.match(/(\d+)\s*(?:min|minutes?)/i);
-    if(durMatch) notes.push(durMatch[1] + ' min');
-
-    // Side notes
-    if(t.includes('mostly left')) notes.push('mostly left');
-    else if(t.includes('mostly right')) notes.push('mostly right');
-    else if(t.includes('left side') || (t.includes('left') && !t.includes('right'))) notes.push('left');
-    else if(t.includes('right side') || (t.includes('right') && !t.includes('left'))) notes.push('right');
-
-    let details = 'Pump';
-    if(amount) details += ' ' + amount;
-    if(notes.length) details += '; ' + notes.join(', ');
-
-    let summary = 'Pump';
-    if(amount) summary += ' — ' + amount;
-    if(notes.length) summary += ', ' + notes.join(', ');
-
-    return {
-      type: 'Pump',
-      summary,
-      details,
-      entry: { date: todayStr(), time: to12(now24()), type: 'Pump', side: '', shield: '', amount, details }
-    };
-  }
-
-  // ---- FEED ----
-  if(matchesAny(t, ['fed','feed','feeding','nursed','nursing','breastfed','ate','eating','breast','bottle','latch','latched'])){
-    let side = '';
-    let shield = '';
-    let amount = '';
-    let notes = [];
-
-    // Parse side
-    if(matchesAny(t, ['left right left','l r l','lrl'])) side = 'LRL';
-    else if(matchesAny(t, ['right left right','r l r','rlr'])) side = 'RLR';
-    else if(matchesAny(t, ['left then right','left to right','left right','l then r','left and right'])) side = 'LR';
-    else if(matchesAny(t, ['right then left','right to left','right left','r then l','right and left'])) side = 'RL';
-    else if(t.includes('both sides')) side = 'LR';
-    else if(matchesAny(t, ['just left','only left','left side','on the left','on left'])) side = 'L';
-    else if(matchesAny(t, ['just right','only right','right side','on the right','on right'])) side = 'R';
-    else {
-      // Simple L/R detection as last resort
-      const hasL = /\bleft\b/.test(t);
-      const hasR = /\bright\b/.test(t);
-      if(hasL && hasR){
-        // Check order
-        const li = t.indexOf('left');
-        const ri = t.indexOf('right');
-        side = li < ri ? 'LR' : 'RL';
-      } else if(hasL) side = 'L';
-      else if(hasR) side = 'R';
-    }
-
-    // Parse shield
-    if(matchesAny(t, ['no shield','without shield','shield off','no nipple shield'])) shield = 'None';
-    else if(matchesAny(t, ['shield on both','shield both','both shields'])) shield = 'Both';
-    else if(matchesAny(t, ['mixed shield','some shield','sometimes shield'])) shield = 'Mixed';
-    else if(matchesAny(t, ['shield on left','shield left','left shield'])) shield = 'L';
-    else if(matchesAny(t, ['shield on right','shield right','right shield'])) shield = 'R';
-    else if(matchesAny(t, ['with shield','shield on','using shield','nipple shield'])) shield = 'Both';
-
-    // Parse amount
-    const mlMatch = t.match(/(\d+)\s*(?:ml|milliliters?)/i);
-    const ozMatch = t.match(/(\d+)\s*(?:oz|ounces?)/i);
-    if(mlMatch) amount = mlMatch[1] + 'ml';
-    else if(ozMatch) amount = ozMatch[1] + 'oz';
-
-    // Parse qualitative notes
-    const noteWords = {
-      'lots of milk': 'lots of milk', 'tons of milk': 'tons of milk',
-      'not much milk': 'not much milk', 'medium milk': 'medium milk',
-      'good latch': 'good latch', 'bad latch': 'bad latch', 'poor latch': 'poor latch',
-      'very sleepy': 'very sleepy', 'super sleepy': 'super sleepy', 'sleepy': 'sleepy',
-      'fussy': 'fussy', 'cluster': 'cluster feeding', 'quick snack': 'quick snack',
-      'fell asleep': 'fell asleep', 'drowsy': 'drowsy',
-      'formula': 'formula', 'bottle': 'bottle'
-    };
-    Object.keys(noteWords).forEach(key => {
-      if(t.includes(key)) notes.push(noteWords[key]);
-    });
-
-    // Build details string
-    let details = 'Feed';
-    if(side) details += ' on ' + side;
-    if(shield && shield !== 'None') details += ' (shield: ' + shield + ')';
-    else if(shield === 'None') details += ' (no shield)';
-    if(amount) details += '; ' + amount;
-    if(notes.length) details += '; ' + notes.join(', ');
-
-    // Build summary
-    const sideDisplay = {L:'Left',R:'Right',LR:'L\u2192R',RL:'R\u2192L',LRL:'L\u2192R\u2192L',RLR:'R\u2192L\u2192R'};
-    let summary = 'Feed';
-    if(side) summary += ' — ' + (sideDisplay[side] || side);
-    if(shield && shield !== 'None') summary += ', shield: ' + shield;
-    else if(shield === 'None') summary += ', no shield';
-    if(notes.length) summary += ', ' + notes.join(', ');
-
-    return {
-      type: 'Feed',
-      summary,
-      details,
-      entry: { date: todayStr(), time: to12(now24()), type: 'Feed', side, shield, amount, details }
-    };
-  }
-
-  // ---- NOTE ----
-  // If nothing else matched but there's text, treat it as a note
-  if(t.length > 2){
-    return {
-      type: 'Note',
-      summary: 'Note',
-      details: text,
-      entry: { date: todayStr(), time: to12(now24()), type: 'Note', side: '', shield: '', amount: '', details: text }
-    };
-  }
-
-  return null;
-}
-
-function matchesAny(text, phrases){
-  return phrases.some(p => text.includes(p));
-}
-
-// ============ RENDERING ============
-function renderAll(){renderStats();renderToday();renderHistory();}
-
-function renderStats(){
-  const today=todayStr();
-  const te=allEntries.filter(e=>normDate(e.date)===today);
-  document.getElementById('statFeeds').textContent=te.filter(e=>e.type==='Feed').length;
-  document.getElementById('statDiapers').textContent=te.filter(e=>e.type==='Diaper').length;
-  document.getElementById('statPumps').textContent=te.filter(e=>e.type==='Pump').length;
-  const feeds=allEntries.filter(e=>e.type==='Feed');
-  document.getElementById('statLastFeed').textContent=feeds.length?feeds[feeds.length-1].time||'-':'-';
-}
-
-function renderEntry(e, idx){
-  const emoji=EMOJIS[e.type]||'\u{1F4DD}';
-  return '<div class="entry-wrapper">'+
-    '<div class="entry '+(e.type||'')+'">'+
-    '<span class="e-emoji">'+emoji+'</span>'+
-    '<span class="e-time">'+(e.time||'')+'</span>'+
-    '<span class="e-detail">'+(e.details||'')+'</span>'+
-    '<button class="e-delete-btn" onclick="confirmDelete('+idx+')" title="Delete">\u00d7</button>'+
-    '</div></div>';
-}
-
-function renderToday(){
-  const today=todayStr();
-  let entries=allEntries.map((e,i)=>({...e,_idx:i})).filter(e=>normDate(e.date)===today);
-  if(currentFilter!=='all')entries=entries.filter(e=>e.type===currentFilter);
-  const c=document.getElementById('todayEntries');
-  if(!entries.length){c.innerHTML='<div class="empty">No entries yet today.<br>Use the buttons below to start logging!</div>';return;}
-  c.innerHTML=entries.slice().reverse().map(e=>renderEntry(e,e._idx)).join('');
-}
-
-function renderHistory(){
-  const grouped={};
-  allEntries.forEach((e,i)=>{const d=normDate(e.date)||'Unknown';if(!grouped[d])grouped[d]=[];grouped[d].push({...e,_idx:i});});
-  const dates=Object.keys(grouped).sort().reverse();
-  const c=document.getElementById('historyEntries');
-  if(!dates.length){c.innerHTML='<div class="empty">No history yet.</div>';return;}
-  c.innerHTML=dates.map(date=>{
-    const entries=grouped[date];
-    const feeds=entries.filter(e=>e.type==='Feed').length;
-    const diapers=entries.filter(e=>e.type==='Diaper').length;
-    const wet=entries.filter(e=>e.type==='Diaper'&&/pee|wet/i.test(e.details||'')).length;
-    const dirty=entries.filter(e=>e.type==='Diaper'&&/poo|dirty|meconium/i.test(e.details||'')).length;
-    const pumps=entries.filter(e=>e.type==='Pump').length;
-    const isToday=date===todayStr();
-    return '<div class="day-group">'+
-      '<div class="day-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">'+
-      '<h3>'+formatDateNice(date)+'</h3>'+
-      '<span class="day-meta">'+entries.length+' entries \u25BE</span></div>'+
-      '<div style="'+(isToday?'':'display:none')+'">'+
-      '<div class="day-summary">'+
-      '<span class="day-badge feed">\u{1F37C} '+feeds+' feeds</span>'+
-      '<span class="day-badge diaper">\u{1F9F7} '+diapers+' ('+wet+'W/'+dirty+'D)</span>'+
-      (pumps?'<span class="day-badge pump">\u{1F95B} '+pumps+' pumps</span>':'')+
-      '</div>'+
-      entries.map(e=>renderEntry(e,e._idx)).join('')+
-      '</div></div>';
-  }).join('');
-}
-
-// ============ SETUP ============
-async function saveSetup(){
-  scriptUrl=document.getElementById('scriptUrl').value.trim();
-  localStorage.setItem('elliot_script_url',scriptUrl);
-  const status=document.getElementById('setupStatus');
-  status.innerHTML='<div class="status-msg loading">Testing...</div>';
-  const data=await apiCall({action:'read'});
-  if(data&&data.success){
-    allEntries=(data.entries||[]).map(e=>({...e,date:normDate(e.date),time:normTime(e.time)}));
-    saveLocal();renderAll();
-    status.innerHTML='<div class="status-msg ok">\u2705 Connected! Loaded '+allEntries.length+' entries.</div>';
-  }else{
-    status.innerHTML='<div class="status-msg err">\u274c Could not connect. Check URL and deployment.</div>';
-  }
-}
-
-// ============ URL PARAMETER AUTO-ADD ============
-function handleUrlParams(){
-  const params=new URLSearchParams(window.location.search);
-  const type=params.get('type');
-  if(!type)return;
-  const time=params.get('time')||to12(now24());
-  const side=params.get('side')||'';
-  const shield=params.get('shield')||'';
-  const amount=params.get('amount')||'';
-  const notes=params.get('notes')||'';
-  const date=params.get('date')||todayStr();
-  let details=type;
-  if(type==='Feed'){
-    details='Feed';
-    if(side)details+=' on '+side;
-    if(shield&&shield!=='None')details+=' (shield: '+shield+')';
-    else if(shield==='None')details+=' (no shield)';
-    if(amount)details+='; '+amount;
-    if(notes)details+='; '+notes;
-  }else if(type==='Pump'){
-    details='Pump';
-    if(amount)details+=' '+amount;
-    if(notes)details+='; '+notes;
-  }else if(type==='Diaper'){
-    details=notes||'Diaper change';
-  }else if(type==='Note'){
-    details=notes||'Note';
-  }
-  const entry={date,time,type,side,shield,amount,details};
-  allEntries.push(entry);
-  saveLocal();renderAll();
-  const banner=document.getElementById('autoAddBanner');
-  const emoji=EMOJIS[type]||'\u{1F4DD}';
-  banner.innerHTML='<div class="auto-add-banner"><h3>'+emoji+' Entry Added!</h3><p>'+time+' \u2014 '+details+'</p></div>';
-  setTimeout(()=>{banner.innerHTML='';},5000);
-  apiCall({action:'add',...entry}).then(r=>{
-    if(r&&r.success)toast('\u2705 Saved to sheet!');
-    else toast('\u{1F4F1} Saved locally');
-  });
-  window.history.replaceState({},'',window.location.pathname);
-}
-
-// ============ INIT ============
-loadLocal();
-renderAll();
-if(scriptUrl){setSyncState('connected');setTimeout(refreshData,1000);}else setSyncState('offline');
-setInterval(()=>{if(scriptUrl)refreshData();},120000);
-handleUrlParams();
-
-// Disable voice button if not supported
-if(!hasVoiceSupport()){
-  const vb = document.getElementById('voiceBtn');
-  if(vb){ vb.style.opacity='0.4'; vb.onclick=function(){toast('Voice not supported. Use Chrome or Safari.');}; }
-}
-</script>
+<script src="app.js"></script>
 </body>
 </html>
