@@ -152,6 +152,8 @@ body {
 .bot-btn .bot-icon { font-size: 20px; }
 .bot-btn.pee { background: var(--green-light); color: var(--green-dark); }
 .bot-btn.poo { background: #FEF3C7; color: #92400E; }
+.bot-btn.poopee { background: linear-gradient(135deg, #FEF3C7 0%, #DCFCE7 100%); color: #92400E; }
+.bot-btn.poopee .bot-icon { font-size: 15px; }
 .bot-btn.feed { background: var(--orange-light); color: var(--orange-dark); }
 .bot-btn.pump { background: var(--blue-light); color: var(--blue-dark); }
 .bot-btn.more { background: var(--gray-100); color: var(--gray-700); }
@@ -344,6 +346,7 @@ body {
 <div class="bottom-bar">
   <button class="bot-btn pee" onclick="quickDiaper('Pee diaper')"><span class="bot-icon">💧</span>Pee</button>
   <button class="bot-btn poo" onclick="quickDiaper('Poo diaper')"><span class="bot-icon">💩</span>Poo</button>
+  <button class="bot-btn poopee" onclick="quickDiaper('Pee & poo diaper')"><span class="bot-icon">💩💧</span>Poo+Pee</button>
   <button class="bot-btn feed" onclick="showFeedForm()"><span class="bot-icon">🍼</span>Feed</button>
   <button class="bot-btn pump" onclick="showPumpForm()"><span class="bot-icon">🥛</span>Pump</button>
   <button class="bot-btn voice" id="voiceBtn" onclick="startVoice()"><span class="bot-icon">🎙️</span>Voice</button>
