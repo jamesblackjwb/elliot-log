@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elliot Log — Setup Guide</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #FAFAFA; color: #1F2937; line-height: 1.6; padding: 20px; max-width: 700px; margin: 0 auto; }
+h1 { font-size: 24px; color: #9A3412; margin-bottom: 8px; }
+h2 { font-size: 18px; color: #6B21A8; margin: 28px 0 12px; }
+.subtitle { color: #6B7280; font-size: 14px; margin-bottom: 24px; }
+.step { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.step-num { display: inline-block; background: #FB923C; color: white; width: 28px; height: 28px; border-radius: 50%; text-align: center; line-height: 28px; font-weight: 700; font-size: 14px; margin-right: 8px; }
+.step-title { font-weight: 700; font-size: 15px; display: inline; }
+.step p { margin-top: 8px; font-size: 14px; color: #374151; }
+.code-block { background: #1F2937; color: #E5E7EB; border-radius: 8px; padding: 16px; margin: 12px 0; font-family: 'SF Mono', Monaco, Menlo, monospace; font-size: 12px; overflow-x: auto; white-space: pre; line-height: 1.5; position: relative; }
+.copy-code { position: absolute; top: 8px; right: 8px; background: #374151; color: #E5E7EB; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.copy-code:active { background: #4B5563; }
+.note { background: #FFF7ED; border-left: 3px solid #FB923C; padding: 12px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 13px; color: #9A3412; }
+.warning { background: #FEF3C7; border-left: 3px solid #F59E0B; padding: 12px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 13px; color: #92400E; }
+.done-box { background: #DCFCE7; border-radius: 12px; padding: 20px; text-align: center; margin-top: 24px; }
+.done-box h3 { color: #166534; font-size: 18px; margin-bottom: 8px; }
+.done-box p { color: #166534; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<h1>Elliot Log — Setup Guide 🍼</h1>
+<p class="subtitle">5 minutes to set up a shared baby tracker for both phones</p>
+
+<h2>Part 1: Set Up the Google Sheet Backend</h2>
+
+<div class="step">
+  <span class="step-num">1</span>
+  <span class="step-title">Open your Google Sheet</span>
+  <p>Go to your <a href="https://docs.google.com/spreadsheets/d/1aBnpagBJnNRRipeKHGcP06-k9fsgOO2_/edit" target="_blank">Elliot Logging spreadsheet</a>.</p>
+  <div class="note">Important: You need to convert it to a native Google Sheet first. Go to <strong>File → Save as Google Sheets</strong>. This creates a new file — use that one going forward.</div>
+</div>
+
+<div class="step">
+  <span class="step-num">2</span>
+  <span class="step-title">Open Apps Script</span>
+  <p>In the new Google Sheet, go to <strong>Extensions → Apps Script</strong>. This opens a code editor.</p>
+</div>
+
+<div class="step">
+  <span class="step-num">3</span>
+  <span class="step-title">Replace the code</span>
+  <p>Delete everything in the editor and paste this code:</p>
+  <div class="code-block" id="appsScript"><button class="copy-code" onclick="copyCode()">Copy</button>function doGet(e) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName('Log');
+    if (!sheet) {
+      sheet = ss.getSheets()[0];
+    }
+
+    var action = e.parameter.action || 'read';
+
+    if (action === 'read') {
+      var lastRow = sheet.getLastRow();
+      var headerRow = 4; // headers are in row 4
+      if (lastRow <= headerRow) {
+        return ContentService.createTextOutput(
+          JSON.stringify({ success: true, entries: [] })
+        ).setMimeType(ContentService.MimeType.JSON);
+      }
+      var dataRange = sheet.getRange(
+        headerRow + 1, 1, lastRow - headerRow, 7
+      );
+      var data = dataRange.getValues();
+      var entries = [];
+      for (var i = 0; i < data.length; i++) {
+        var row = data[i];
+        if (!row[0] && !row[1]) continue; // skip empty rows
+        entries.push({
+          date: row[0] ? row[0].toString() : '',
+          time: row[1] ? row[1].toString() : '',
+          type: row[2] ? row[2].toString() : '',
+          side: row[3] ? row[3].toString() : '',
+          shield: row[4] ? row[4].toString() : '',
+          amount: row[5] ? row[5].toString() : '',
+          details: row[6] ? row[6].toString() : ''
+        });
+      }
+      return ContentService.createTextOutput(
+        JSON.stringify({ success: true, entries: entries })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Add entry
+    if (action === 'add') {
+      var date = e.parameter.date || '';
+      var time = e.parameter.time || '';
+      var type = e.parameter.type || '';
+      var side = e.parameter.side || '';
+      var shield = e.parameter.shield || '';
+      var amount = e.parameter.amount || '';
+      var details = e.parameter.details || '';
+
+      sheet.appendRow([date, time, type, side, shield, amount, details]);
+
+      return ContentService.createTextOutput(
+        JSON.stringify({ success: true, message: 'Entry added' })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Delete entry
+    if (action === 'delete') {
+      var delDate = e.parameter.date || '';
+      var delTime = e.parameter.time || '';
+      var delType = e.parameter.type || '';
+      var delDetails = e.parameter.details || '';
+      var lastRow = sheet.getLastRow();
+      var headerRow = 4;
+
+      // Search from bottom up to find matching row
+      for (var r = lastRow; r > headerRow; r--) {
+        var rowData = sheet.getRange(r, 1, 1, 7).getValues()[0];
+        var rowDate = rowData[0] ? rowData[0].toString() : '';
+        var rowTime = rowData[1] ? rowData[1].toString() : '';
+        var rowType = rowData[2] ? rowData[2].toString() : '';
+        var rowDetails = rowData[6] ? rowData[6].toString() : '';
+
+        if (rowTime === delTime && rowType === delType &&
+            rowDetails === delDetails) {
+          sheet.deleteRow(r);
+          return ContentService.createTextOutput(
+            JSON.stringify({ success: true, message: 'Entry deleted' })
+          ).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+
+      return ContentService.createTextOutput(
+        JSON.stringify({ success: false, message: 'Entry not found' })
+      ).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    return ContentService.createTextOutput(
+      JSON.stringify({ success: false, message: 'Unknown action' })
+    ).setMimeType(ContentService.MimeType.JSON);
+
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function doPost(e) {
+  return doGet(e);
+}</div>
+</div>
+
+<div class="step">
+  <span class="step-num">4</span>
+  <span class="step-title">Deploy as a web app</span>
+  <p>Click <strong>Deploy → New deployment</strong> (top right). Then:</p>
+  <p>• Click the gear icon → select <strong>"Web app"</strong></p>
+  <p>• Set <strong>"Execute as"</strong> to <strong>"Me"</strong></p>
+  <p>• Set <strong>"Who has access"</strong> to <strong>"Anyone"</strong></p>
+  <p>• Click <strong>Deploy</strong></p>
+  <p>• Google will ask you to authorize — click through the prompts</p>
+  <p>• <strong>Copy the Web App URL</strong> — it looks like:<br><code>https://script.google.com/macros/s/AKfyc.../exec</code></p>
+  <div class="warning">Save this URL! You'll paste it into the app in the next step.</div>
+</div>
+
+<h2>Part 2: Set Up the App on Your Phones</h2>
+
+<div class="step">
+  <span class="step-num">5</span>
+  <span class="step-title">Open the Elliot Log app</span>
+  <p>Open the <strong>elliot-log-app.html</strong> file in Safari on your iPhone (you can AirDrop it or put it in iCloud Drive).</p>
+</div>
+
+<div class="step">
+  <span class="step-num">6</span>
+  <span class="step-title">Connect to your Google Sheet</span>
+  <p>Tap the <strong>⚙️ Setup</strong> button at the top and paste your Web App URL from Step 4. Tap <strong>Save & Test</strong>.</p>
+</div>
+
+<div class="step">
+  <span class="step-num">7</span>
+  <span class="step-title">Add to Home Screen</span>
+  <p>In Safari, tap the <strong>Share button</strong> (square with arrow) → <strong>"Add to Home Screen"</strong>. Name it "Elliot Log".</p>
+  <p>Repeat steps 5–7 on your wife's phone!</p>
+</div>
+
+<div class="done-box">
+  <h3>You're all set! 🎉</h3>
+  <p>Both phones now read and write to the same Google Sheet.<br>Every entry either of you logs shows up for both of you.</p>
+</div>
+
+<script>
+function copyCode() {
+  var code = document.getElementById('appsScript').textContent.replace('Copy', '').trim();
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code);
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  var btn = document.querySelector('.copy-code');
+  btn.textContent = 'Copied!';
+  setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+}
+</script>
+</body>
+</html>
